@@ -1,0 +1,27 @@
+<html>
+    <p id="count"></p>
+    <script>
+        function wait(){
+            return new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        async function main(){
+            let count = 25;
+
+            while(count >= 0){
+                console.log(count);
+                document.getElementById("count").innerHTML = "Counting "+ count;
+                await wait();
+                count--;
+            }
+            let ans = confirm("Again ?");
+
+            if (ans == true){
+                main();
+            }
+        }
+
+        main();
+    </script>
+
+</html>
