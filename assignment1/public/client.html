@@ -1,0 +1,60 @@
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<div id="weather">
+    <h1>{{message}}</h1>
+    <div v-if="pack != null">
+        <p>Will it rain in {{url}} in the next 5 days ? {{pack}}</p>
+        <p v-if="pack == true">Bring an umbrella!!</p>
+    </div>
+    <span v-if="temp.length != 0">
+        max : {{temp[0]}} {{temp[1]}}
+        <br>
+        min : {{temp[2]}} {{temp[3]}}
+    </span>
+    <div v-if="table.length > 1">
+            <p>Wind  Rain Temp</p>
+        <span v-for="y in 5">
+            day {{y}} : 
+            <span v-for="x in 3">
+                <span v-if="table[y-1][x-1] == null">0</span>
+                    {{table[y-1][x-1]}}
+                <br v-if="x == 3">
+            </span>
+        </span>
+    </div>
+    <div v-if="pm25 != null">
+        <p v-if="pm25 > 10">Wear a mask pm2_5 reading is {{pm25}}</p>
+        <p v-else>No need to wear a mask pm2_5 reading is only {{pm25}}</p>
+    </div>
+    <br>
+    <input v-model="url" placeholder="enter city/country">
+    <button v-on:click="api">submit</button>
+    <p v-if="url != null">You are searching for {{url}}</p>
+</div>
+
+<script>
+    var weather = new Vue({
+        el: '#weather',
+        data: {
+            message: 'Weather Forecast',
+            pack: null,     // true/false pack for rain ?
+            temp: [],       // max / min temp next 5 days
+            table: [],      // wind rain temp for next 5 days
+            pm25: null,     // pm25 reading
+            url: null,      // destination e.g. dublin/ireland
+        },
+        methods:{
+            api: API
+        }
+    })
+    function API(){
+        fetch('/weather/' + this.url)
+        .then((result) => {
+            return result.json();
+        }).then(result => {
+            this.pack = result[0];
+            this.temp = result[1];
+            this.table = result[2];
+            this.pm25 = result[3];
+        });
+    }
+</script>
