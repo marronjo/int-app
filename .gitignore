@@ -1,1 +1,5 @@
 /secrets.json
+
+/aws/node_modules
+/aws/package-lock.json
+/aws/package.json
