@@ -1,0 +1,82 @@
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<div id="aws">
+    <button v-on:click="createDb">Create DB</button>
+    <div>{{creating}}</div>
+    <input v-model="url" placeholder="enter year/name/rating">
+    <button v-on:click="queryDb">Query DB</button>
+    <div v-if="results.length != 0">
+        <span v-for="y in results.length">
+            <span v-for="x in 5">
+                {{results[y-1][x-1]}}
+            </span>
+            <br>
+        </span>
+    </div>
+    <br>
+    <button v-on:click="deleteDb">Delete DB</button>
+    <div>{{deleted}}</div>
+</div>
+
+<script>
+    var aws = new Vue({
+        el: '#aws',
+        data: {
+            msg: null,
+            url: null,
+            results: [],
+            deleted: null,
+            creating: null
+        },
+        methods:{
+            createDb: CreateDb,
+            queryDb: QueryDb,
+            deleteDb: DeleteDb
+        }
+    })
+    function CreateDb(){
+        this.creating = "Creating database and populating the table";
+        fetch('/')
+        .then(() => {
+            this.creating = "Database successfully created!";
+        });
+    }
+    function QueryDb(){
+        fetch('/' + this.url)
+        .then((result) => {
+            return result.json();
+        }).then((result) => {
+        console.log(result);
+            var arr = [];
+            result.forEach(element => {
+                console.log(element);
+                arr.push([
+                    element.title,
+                    element.year,
+                    element.rating,
+                    element.rank,
+                    element.release_date.slice(0, element.release_date.length - 10)
+                ]);
+            });
+            this.results = arr;
+            console.log(this.results);
+            
+        });
+    }
+    function DeleteDb(){
+        fetch('/delete')
+        .then(() => {
+            this.deleted = "Database Successfully deleted!";
+            this.creating = null;
+            this.results = [];
+        });
+    }
+</script>
+
+<!--
+    To expand to 100 million simultaneous users more s3 buckets would be needed to avoid complications
+    with so many users trying to access the same buckets at the same moment. Also more error checking
+    would be needed to ensure a more reliable user experience. Single points of failure must be removed.
+    Load balancing can be used, this is implimented by amazon ec2 by spinning up multiple concurrent instances
+    and balancing the traffic between each. Also browser caching can help to reduce the number and frequency
+    of web requests send to the backend services. 
+-->
